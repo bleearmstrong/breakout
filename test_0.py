@@ -4,6 +4,20 @@ import time
 import pywinauto
 import cv2 as cv
 import numpy
+from collections import deque
+
+
+class PairList:
+    def __init__(self):
+        self.this_deque = deque([None, None])
+
+    def add(self, item):
+        self.this_deque.rotate()
+        self.this_deque.pop()
+        self.this_deque.append(item)
+
+    def get(self):
+        return self.this_deque[0], self.this_deque[1]
 
 
 class Breakout:
@@ -17,6 +31,7 @@ class Breakout:
                        , 'paddle': (223, 513, 223 + 337, 513 + 24)}
         self.templates = {'ball': cv.imread('C:/Users/ben/Documents/screens/ball.png', 0)
                           , 'paddle': cv.imread("C:/Users/ben/Documents/screens/paddle.png", 0)}
+
 
     def _screen_grab(self, coords):
         screen = ImageGrab.grab(coords)
@@ -33,7 +48,6 @@ class Breakout:
     def start(self):
         press(RETURN, .2)
         time.sleep(6)
-        press(S, .2)
 
     def get_item_position(self, item):
         screen = self._screen_grab(self.coords[item]).convert('L')
@@ -53,14 +67,19 @@ class Breakout:
         return int((point[0][0] + point[1][0]) / 2), int((point[0][1] + point[1][1]) / 2)
 
 
+
+
 bo = Breakout()
 bo.bring_up()
 time.sleep(3)
 bo.start()
 
 time.sleep(2)
-x = bo.get_ball_position()
+press(S, .1)
+x = bo.get_item_position('ball')
+y = bo.get_item_position('paddle')
 print(x)
+print(y)
 
 bo._save_screen()
 
