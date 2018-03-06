@@ -21,17 +21,20 @@ class PairList:
 
 
 class Breakout:
+
+    Y_TARGET = 517
+
     def __init__(self):
         subprocess.Popen(
             '"C:/Users/ben/Downloads/bgb/bgb.exe" -rom "C:/Users/ben/Downloads/VisualBoyAdvance-1.8.0-beta3/Alleyway (JUE) [!].gb"')
         tasklist = [line.split() for line in subprocess.check_output("tasklist").splitlines()][1:]
         item = [task for task in tasklist if b'bgb' in task[0]]
         self.pid = int(item[0][1])
-        self.coords = {'ball': (210, 144, 210 + 358, 144 + 422)
-                       , 'paddle': (223, 513, 223 + 337, 513 + 24)}
+        self.coords = {'ball': (224, 182, 224 + 336, 182 + 384)
+                       , 'paddle': (224, 515, 224 + 336, 513 + 21)}
         self.templates = {'ball': cv.imread('C:/Users/ben/Documents/screens/ball.png', 0)
                           , 'paddle': cv.imread("C:/Users/ben/Documents/screens/paddle.png", 0)}
-
+        self.pair_list = PairList()
 
     def _screen_grab(self, coords):
         screen = ImageGrab.grab(coords)
@@ -66,6 +69,25 @@ class Breakout:
     def get_midpoint(self, point):
         return int((point[0][0] + point[1][0]) / 2), int((point[0][1] + point[1][1]) / 2)
 
+    def predict(self):
+        point_1, point_2 = self.pair_list.get()
+        m = (point_2[1] - point_1[1]) / (point_2[0] - point_1[0])
+        if m > 0:
+            return
+        b = point_1[1] - m*point_1[0]
+        x_target = (Breakout.Y_TARGET - b) / m
+        return x_target
+
+    def in_play(self):
+        if self.get_item_position('ball'):
+            self.pair_list.add(self.get_item_position('ball'))
+            self.pair_list.add(self.get_item_position('ball'))
+            while self.get_item_position('ball'):
+                if self.predict():
+                    x_target = self.predict()
+
+
+
 
 
 
@@ -87,4 +109,4 @@ bo._save_screen()
 def get_midpoint(point):
     return int((point[0][0] + point[1][0]) / 2), int((point[0][1] + point[1][1]) / 2)
 
-get_midpoint(x)
+get_midpoint(y)
