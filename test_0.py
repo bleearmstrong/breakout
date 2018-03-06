@@ -5,6 +5,7 @@ import pywinauto
 import cv2 as cv
 import numpy
 from collections import deque
+from threading import Thread
 
 
 class PairList:
@@ -35,6 +36,7 @@ class Breakout:
         self.templates = {'ball': cv.imread('C:/Users/ben/Documents/screens/ball.png', 0)
                           , 'paddle': cv.imread("C:/Users/ben/Documents/screens/paddle.png", 0)}
         self.pair_list = PairList()
+        self.desired_paddle_position = 50
 
     def _screen_grab(self, coords):
         screen = ImageGrab.grab(coords)
@@ -51,6 +53,7 @@ class Breakout:
     def start(self):
         press(RETURN, .2)
         time.sleep(6)
+        self.move_paddle()
 
     def get_item_position(self, item):
         screen = self._screen_grab(self.coords[item]).convert('L')
@@ -86,6 +89,19 @@ class Breakout:
                 if self.predict():
                     x_target = self.predict()
 
+    def _move_paddle(self):
+        while True:
+            current_position = self.get_midpoint(self.get_item_position('paddle'))[0]
+            move = self.desired_paddle_position - current_position
+            hold = abs(move/10 * 0.03)
+            if move > 0:
+                press(R, hold)
+            else:
+                press(E, hold)
+            time.sleep(.05)
+
+    def move_paddle(self):
+        Thread(target=self._move_paddle).start()
 
 
 
@@ -109,4 +125,4 @@ bo._save_screen()
 def get_midpoint(point):
     return int((point[0][0] + point[1][0]) / 2), int((point[0][1] + point[1][1]) / 2)
 
-get_midpoint(y)
+get_midpoint(y)[0]
