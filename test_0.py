@@ -81,13 +81,18 @@ class Breakout:
         x_target = (Breakout.Y_TARGET - b) / m
         return x_target
 
-    def in_play(self):
-        if self.get_item_position('ball'):
-            self.pair_list.add(self.get_item_position('ball'))
-            self.pair_list.add(self.get_item_position('ball'))
-            while self.get_item_position('ball'):
-                if self.predict():
-                    x_target = self.predict()
+    def _in_play(self):
+        press(S, .1)
+        time.sleep(1)
+        self.pair_list.add(self.get_item_position('ball'))
+        self.pair_list.add(self.get_item_position('ball'))
+        while True:
+            if self.get_item_position('ball'):
+                while self.get_item_position('ball'):
+                    if self.predict():
+                        x_target = self.predict()
+                        self.desired_paddle_position = x_target
+            time.sleep(.05)
 
     def _move_paddle(self):
         while True:
@@ -103,6 +108,9 @@ class Breakout:
     def move_paddle(self):
         Thread(target=self._move_paddle).start()
 
+    def in_play(self):
+        Thread(target=self._in_play).start()
+
 
 
 
@@ -113,7 +121,7 @@ time.sleep(3)
 bo.start()
 
 time.sleep(2)
-press(S, .1)
+bo.in_play()
 x = bo.get_item_position('ball')
 y = bo.get_item_position('paddle')
 print(x)
