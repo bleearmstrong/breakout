@@ -7,6 +7,8 @@ import numpy
 from collections import deque
 from threading import Thread
 import keyboard
+import solving
+
 
 class PairList:
     def __init__(self):
@@ -99,8 +101,13 @@ class Breakout:
             if self.get_item_position('ball'):
                 while self.get_item_position('ball'):
                     self.pair_list.add(self.get_item_position('ball'))
-                    if self.predict():
-                        x_target = self.predict()
+                    print(self.pair_list.get())
+                    point_1, point_2 = self.pair_list.get()
+                    point_1 = self.get_midpoint(point_1)
+                    point_2 = self.get_midpoint(point_2)
+                    points = (point_1, point_2)
+                    if solving.predict(points, w=336, t=334):
+                        x_target = solving.predict(points, w=336, t=334)
                         self.desired_paddle_position = x_target
             time.sleep(.05)
 
