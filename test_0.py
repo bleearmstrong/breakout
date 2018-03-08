@@ -23,7 +23,7 @@ class PairList:
 
 class Breakout:
 
-    Y_TARGET = 517
+    Y_TARGET = 334
 
     def __init__(self):
         subprocess.Popen(
@@ -38,7 +38,7 @@ class Breakout:
                           , 'paddle': cv.imread("C:/Users/ben/Documents/screens/paddle.png", 0)
                           , 'kill': cv.imread("C:/Users/ben/Documents/screens/kill_box.png", 0)}
         self.pair_list = PairList()
-        self.desired_paddle_position = 50
+        self.desired_paddle_position = 118
         self.kill_box = (203, 106, 203 + 127, 106 + 24)
         self.kill_image = cv.imread('C:/Users/ben/Documents/screens/kill_box.png', 0)
 
@@ -86,7 +86,7 @@ class Breakout:
             return
         b = point_1[1] - m*point_1[0]
         x_target = (Breakout.Y_TARGET - b) / m
-        print(x_target)
+        print('x_target = ' + str(x_target))
         return x_target
 
     def _in_play(self):
@@ -98,6 +98,7 @@ class Breakout:
             print(self.pair_list.get())
             if self.get_item_position('ball'):
                 while self.get_item_position('ball'):
+                    self.pair_list.add(self.get_item_position('ball'))
                     if self.predict():
                         x_target = self.predict()
                         self.desired_paddle_position = x_target
@@ -109,8 +110,10 @@ class Breakout:
             move = self.desired_paddle_position - current_position
             hold = abs(move/10 * 0.03)
             if move > 0:
+                print('moving R for ' + str(hold) + ' seconds')
                 keyboard.press(keyboard.R, hold)
             else:
+                print('moving L for ' + str(hold) + ' seconds')
                 keyboard.press(keyboard.E, hold)
             time.sleep(.05)
 
@@ -143,6 +146,8 @@ time.sleep(1)
 bo.kill()
 
 bo._save_screen()
+
+bo.pair_list.get()
 
 
 def get_midpoint(point):
