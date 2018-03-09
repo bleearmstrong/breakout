@@ -58,7 +58,7 @@ class Breakout:
     def _save_screen(self, extra=''):
         N = 5
         screen = self._screen_grab(self.coords['ball'])
-        screen.save('C:/Users/ben/Documents/screens/test' + str(int(time.time())) + extra + '.png')
+        screen.save('C:/Users/ben/Documents/screens/test' + str(time.time()) + extra + '.png')
 
     def start(self):
         keyboard.press(keyboard.RETURN, .2)
@@ -102,15 +102,17 @@ class Breakout:
         self.pair_list.add(self.get_item_position('ball'))
         i = 0
         while True and self.kill():
-            print(self.pair_list.get())
+            # print(self.pair_list.get())
             if self.get_item_position('ball'):
                 while self.get_item_position('ball'):
                     i += 1
-                    if i % 10 == 0:
-                        self.pair_list.add(self.get_item_position('ball'))
+                    self.pair_list.add(self.get_item_position('ball'))
+                    if i % 2 == 0:
                         self._save_screen(str(self.pair_list.get()[1]))
-                    print(self.pair_list.get())
+                    # print(self.pair_list.get())
                     point_1, point_2 = self.pair_list.get()
+                    if not self.get_item_position('ball'):
+                        break
                     point_1 = self.get_midpoint(point_1)
                     point_2 = self.get_midpoint(point_2)
                     points = (point_1, point_2)
