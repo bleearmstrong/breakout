@@ -8,6 +8,8 @@ from collections import deque
 from threading import Thread
 import keyboard
 import solving
+import random
+import string
 
 
 class PairList:
@@ -53,14 +55,14 @@ class Breakout:
         app = pywinauto.application.Application().connect(process=self.pid)
         app.top_window().set_focus()
 
-    def _save_screen(self):
-        screen = self._screen_grab(self.main_coords)
-        screen.save('C:/Users/ben/Documents/screens/test' + str(int(time.time())) + '.png')
+    def _save_screen(self, extra=''):
+        N = 5
+        screen = self._screen_grab(self.coords['ball'])
+        screen.save('C:/Users/ben/Documents/screens/test' + str(int(time.time())) + extra + '.png')
 
     def start(self):
         keyboard.press(keyboard.RETURN, .2)
         time.sleep(6)
-        self.move_paddle()
 
     def get_item_position(self, item):
         screen = self._screen_grab(self.coords[item]).convert('L')
@@ -94,13 +96,19 @@ class Breakout:
     def _in_play(self):
         keyboard.press(keyboard.S, .1)
         time.sleep(1)
+        self.move_paddle()
         self.pair_list.add(self.get_item_position('ball'))
+        time.sleep(.25)
         self.pair_list.add(self.get_item_position('ball'))
+        i = 0
         while True and self.kill():
             print(self.pair_list.get())
             if self.get_item_position('ball'):
                 while self.get_item_position('ball'):
-                    self.pair_list.add(self.get_item_position('ball'))
+                    i += 1
+                    if i % 10 == 0:
+                        self.pair_list.add(self.get_item_position('ball'))
+                        self._save_screen(str(self.pair_list.get()[1]))
                     print(self.pair_list.get())
                     point_1, point_2 = self.pair_list.get()
                     point_1 = self.get_midpoint(point_1)
@@ -116,11 +124,12 @@ class Breakout:
             current_position = self.get_midpoint(self.get_item_position('paddle'))[0]
             move = self.desired_paddle_position - current_position
             hold = abs(move/10 * 0.03)
+            print(self.desired_paddle_position)
             if move > 0:
-                print('moving R for ' + str(hold) + ' seconds')
+                # print('moving R for ' + str(hold) + ' seconds')
                 keyboard.press(keyboard.R, hold)
             else:
-                print('moving L for ' + str(hold) + ' seconds')
+                # print('moving L for ' + str(hold) + ' seconds')
                 keyboard.press(keyboard.E, hold)
             time.sleep(.05)
 
