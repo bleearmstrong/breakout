@@ -55,6 +55,9 @@ def predict(points, t, w):
                 m = -m
                 b = collision_point[1] - m * collision_point[0]
                 line = m, b
+                new_point = w - 1, m * (w - 1) + b
+                points = collision_point, new_point
+                print('new_points = ' + str(points))
         else:
             if 0 < -b / m < w:
                 print('c')
@@ -62,15 +65,27 @@ def predict(points, t, w):
                 m = -m
                 b = collision_point[1] - m * collision_point[0]
                 line = m, b
-                new_point = (collision_point, ((((collision_point[1] - 1) - b) / m), collision_point[1] - 1))
+                adj = 1 if m < 0 else -1
+                new_point = (collision_point, ((((collision_point[1] + adj) - b) / m), collision_point[1] + adj))
                 points = new_point
                 print('new_points = ' + str(points))
             else:
-                print('d')
-                collision_point = w, m * w + b
-                m = -m
-                b = collision_point[1] - m * collision_point[0]
-                line = m, b
+                if m > 0:
+                    print('d')
+                    collision_point = w, m * w + b
+                    m = -m
+                    b = collision_point[1] - m * collision_point[0]
+                    line = m, b
+                    new_point = collision_point[0] + 1, m * (collision_point[0] - 1) + b
+                    points = collision_point, new_point
+                    print('new_points = ' + str(points))
+                else:
+                    print('e')
+                    collision_point = 0, b
+                    m = -m
+                    b = collision_point[1] - m * collision_point[0]
+                    line = m, b
+                    new
 
         i += 1
         print('collision_point = ' + str(collision_point))
