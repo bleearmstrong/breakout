@@ -105,15 +105,22 @@ class Breakout:
             # print(self.pair_list.get())
             if self.get_item_position('ball'):
                 while self.get_item_position('ball'):
+                    print('predicting: time is ' + str(time.time()))
                     i += 1
                     self.pair_list.add(self.get_item_position('ball'))
                     if i % 2 == 0:
                         self._save_screen(str(self.pair_list.get()[1]))
                     # print(self.pair_list.get())
                     point_1, point_2 = self.pair_list.get()
-                    if not self.get_item_position('ball'):
+                    print('point_2 = ' + str(point_2))
+                    if point_2 == 0 or point_1 == 0:
+                        print('breaking')
                         break
+                    if point_1 == point_2:
+                        print('continuing')
+                        continue
                     point_1 = self.get_midpoint(point_1)
+                    print('point_2 = ' + str(point_2))
                     point_2 = self.get_midpoint(point_2)
                     points = (point_1, point_2)
                     if solving.predict(points, w=336, t=334):
@@ -125,8 +132,10 @@ class Breakout:
         while True and self.kill():
             current_position = self.get_midpoint(self.get_item_position('paddle'))[0]
             move = self.desired_paddle_position - current_position
+            if abs(move) < 5:
+                continue
             hold = abs(move/10 * 0.03)
-            print(self.desired_paddle_position)
+            print('desired paddle position is : ' + str(self.desired_paddle_position))
             if move > 0:
                 # print('moving R for ' + str(hold) + ' seconds')
                 keyboard.press(keyboard.R, hold)
@@ -134,6 +143,7 @@ class Breakout:
                 # print('moving L for ' + str(hold) + ' seconds')
                 keyboard.press(keyboard.E, hold)
             time.sleep(.05)
+            print('moving paddle; time is ' + str(time.time()))
 
     def move_paddle(self):
         Thread(target=self._move_paddle).start()
@@ -155,20 +165,23 @@ bo.start()
 
 time.sleep(2)
 bo.in_play()
-x = bo.get_item_position('ball')
-y = bo.get_item_position('paddle')
-print(x)
-print(y)
-bo.bring_up()
-time.sleep(1)
-bo.kill()
-
-bo._save_screen()
 
 bo.pair_list.get()
 
-
-def get_midpoint(point):
-    return int((point[0][0] + point[1][0]) / 2), int((point[0][1] + point[1][1]) / 2)
-
-get_midpoint(y)[0]
+# x = bo.get_item_position('ball')
+# y = bo.get_item_position('paddle')
+# print(x)
+# print(y)
+# bo.bring_up()
+# time.sleep(1)
+# bo.kill()
+#
+# bo._save_screen()
+#
+# bo.pair_list.get()
+#
+#
+# def get_midpoint(point):
+#     return int((point[0][0] + point[1][0]) / 2), int((point[0][1] + point[1][1]) / 2)
+#
+# get_midpoint(y)[0]
