@@ -19,6 +19,8 @@ def done(line, t, w, points):
     m, b = line
     print('done program: line = ' + str(line))
     x = (-t - b) / m
+    if 0 < x < w and down(points):
+        print('solved!')
     return 0 < x < w and down(points)
 
 # done((-1, 1), 90, 100, )
@@ -101,6 +103,7 @@ def predict(points, t=None, w=None):
         # print('**************')
     m, b = line
     # print(line)
+    print('solved!')
     return (-t - b) / m
 
 

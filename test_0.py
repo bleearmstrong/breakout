@@ -8,8 +8,8 @@ from collections import deque
 from threading import Thread
 import keyboard
 import solving
-import random
-import string
+import zmq
+# import comm
 
 
 class PairList:
@@ -45,6 +45,8 @@ class Breakout:
         self.desired_paddle_position = 118
         self.kill_box = (203, 106, 203 + 127, 106 + 24)
         self.kill_image = cv.imread('C:/Users/ben/Documents/screens/kill_box.png', 0)
+        self.ball_position = None
+        self.paddle_position = None
 
 
     def _screen_grab(self, coords):
@@ -90,7 +92,7 @@ class Breakout:
             return
         b = point_1[1] - m*point_1[0]
         x_target = (Breakout.Y_TARGET - b) / m
-        print('x_target = ' + str(x_target))
+        # print('x_target = ' + str(x_target))
         return x_target
 
     def _in_play(self):
@@ -101,27 +103,31 @@ class Breakout:
         time.sleep(.25)
         self.pair_list.add(self.get_item_position('ball'))
         i = 0
+        self.communicate()
+        print('startCOMMUNICATE')
         while True and self.kill():
             # print(self.pair_list.get())
             if self.get_item_position('ball'):
                 while self.get_item_position('ball'):
-                    print('predicting: time is ' + str(time.time()))
+                    print('ball position: ' + str(self.ball_position))
+                    # print('predicting: time is ' + str(time.time()))
                     i += 1
                     self.pair_list.add(self.get_item_position('ball'))
                     if i % 2 == 0:
                         self._save_screen(str(self.pair_list.get()[1]))
                     # print(self.pair_list.get())
                     point_1, point_2 = self.pair_list.get()
-                    print('point_2 = ' + str(point_2))
+                    # print('point_2 = ' + str(point_2))
                     if point_2 == 0 or point_1 == 0:
-                        print('breaking')
+                        # print('breaking')
                         break
                     if point_1 == point_2:
-                        print('continuing')
+                        # print('continuing')
                         continue
                     point_1 = self.get_midpoint(point_1)
-                    print('point_2 = ' + str(point_2))
+                    # print('point_2 = ' + str(point_2))
                     point_2 = self.get_midpoint(point_2)
+                    self.ball_position = point_2
                     points = (point_1, point_2)
                     if solving.predict(points, w=336, t=334):
                         x_target = solving.predict(points, w=336, t=334)
@@ -132,10 +138,10 @@ class Breakout:
         while True and self.kill():
             current_position = self.get_midpoint(self.get_item_position('paddle'))[0]
             move = self.desired_paddle_position - current_position
-            if abs(move) < 5:
+            if abs(move) < 10:
                 continue
-            hold = abs(move/10 * 0.03)
-            print('desired paddle position is : ' + str(self.desired_paddle_position))
+            hold = abs(move/10 * 0.04)
+            # print('desired paddle position is : ' + str(self.desired_paddle_position))
             if move > 0:
                 # print('moving R for ' + str(hold) + ' seconds')
                 keyboard.press(keyboard.R, hold)
@@ -143,13 +149,32 @@ class Breakout:
                 # print('moving L for ' + str(hold) + ' seconds')
                 keyboard.press(keyboard.E, hold)
             time.sleep(.05)
-            print('moving paddle; time is ' + str(time.time()))
+            # print('moving paddle; time is ' + str(time.time()))
+        # print('*****************************************   no more paddle :(')
 
     def move_paddle(self):
         Thread(target=self._move_paddle).start()
 
     def in_play(self):
         Thread(target=self._in_play).start()
+
+    def communicate(self):
+        Thread(target=self._communicate).start()
+
+    def _communicate(self):
+        print('start_communicate')
+        port = "5556"
+        context = zmq.Context()
+        socket = context.socket(zmq.PAIR)
+        socket.connect("tcp://localhost:%s" % port)
+        while self.ball_position is None:
+            time.sleep(.5)
+            print('waiting on position')
+        while True and self.kill() and self.ball_position:
+            print('sending position')
+            print(self.ball_position)
+            socket.send_string(str(self.ball_position))
+            time.sleep(.1)
 
     def kill(self):
         return self.get_item_position('kill')
