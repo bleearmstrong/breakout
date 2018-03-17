@@ -9,6 +9,7 @@ from threading import Thread
 import keyboard
 import solving
 import zmq
+
 # import comm
 
 
@@ -47,6 +48,9 @@ class Breakout:
         self.kill_image = cv.imread('C:/Users/ben/Documents/screens/kill_box.png', 0)
         self.ball_position = None
         self.paddle_position = None
+        self.ball_history = list()
+        self.paddle_history = list()
+        self.desired_paddle_position_history = list()
 
 
     def _screen_grab(self, coords):
@@ -103,8 +107,8 @@ class Breakout:
         time.sleep(.25)
         self.pair_list.add(self.get_item_position('ball'))
         i = 0
-        self.communicate()
-        print('startCOMMUNICATE')
+        # self.communicate()
+        # print('startCOMMUNICATE')
         while True and self.kill():
             # print(self.pair_list.get())
             if self.get_item_position('ball'):
@@ -132,11 +136,17 @@ class Breakout:
                     if solving.predict(points, w=336, t=334):
                         x_target = solving.predict(points, w=336, t=334)
                         self.desired_paddle_position = x_target
+                    self.ball_history.append(self.ball_position)
+                    self.paddle_history.append(self.paddle_position)
+                    self.desired_paddle_position_history.append(self.desired_paddle_position)
             time.sleep(.05)
+
 
     def _move_paddle(self):
         while True and self.kill():
             current_position = self.get_midpoint(self.get_item_position('paddle'))[0]
+            self.paddle_position = current_position
+
             move = self.desired_paddle_position - current_position
             if abs(move) < 10:
                 continue
