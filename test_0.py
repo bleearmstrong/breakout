@@ -113,12 +113,12 @@ class Breakout:
             # print(self.pair_list.get())
             if self.get_item_position('ball'):
                 while self.get_item_position('ball'):
-                    print('ball position: ' + str(self.ball_position))
+                    # print('ball position: ' + str(self.ball_position))
                     # print('predicting: time is ' + str(time.time()))
                     i += 1
                     self.pair_list.add(self.get_item_position('ball'))
-                    if i % 2 == 0:
-                        self._save_screen(str(self.pair_list.get()[1]))
+                    # if i % 2 == 0:
+                    #     self._save_screen(str(self.pair_list.get()[1]))
                     # print(self.pair_list.get())
                     point_1, point_2 = self.pair_list.get()
                     # print('point_2 = ' + str(point_2))
@@ -133,9 +133,9 @@ class Breakout:
                     point_2 = self.get_midpoint(point_2)
                     self.ball_position = point_2
                     points = (point_1, point_2)
-                    if solving.predict(points, w=336, t=334):
-                        x_target = solving.predict(points, w=336, t=334)
-                        self.desired_paddle_position = x_target
+                    # if solving.predict(points, w=336, t=334):
+                    x_target = solving.predict(points, w=336, t=334)
+                    self.desired_paddle_position = x_target
                     self.ball_history.append(self.ball_position)
                     self.paddle_history.append(self.paddle_position)
                     self.desired_paddle_position_history.append(self.desired_paddle_position)
@@ -143,14 +143,24 @@ class Breakout:
 
 
     def _move_paddle(self):
+        millis = int(round(time.time() * 1000))
         while True and self.kill():
+            print('moving!')
+            print('millis since last move: ' + str(millis - int(round(time.time() * 1000))))
             current_position = self.get_midpoint(self.get_item_position('paddle'))[0]
             self.paddle_position = current_position
-
+            print('current position: ' + str(current_position))
+            print('desired paddle position = ' + str(self.desired_paddle_position))
             move = self.desired_paddle_position - current_position
+            print('move = ' + str(move))
             if abs(move) < 10:
                 continue
-            hold = abs(move/10 * 0.04)
+            if abs(move) > 336:
+                move = 10
+
+            hold = abs(move/20 * 0.04)
+            # print('hold = ' + str(hold))
+            # hold = .1
             # print('desired paddle position is : ' + str(self.desired_paddle_position))
             if move > 0:
                 # print('moving R for ' + str(hold) + ' seconds')
@@ -158,7 +168,8 @@ class Breakout:
             else:
                 # print('moving L for ' + str(hold) + ' seconds')
                 keyboard.press(keyboard.E, hold)
-            time.sleep(.05)
+            millis = int(round(time.time() * 1000))
+            # time.sleep(.05)
             # print('moving paddle; time is ' + str(time.time()))
         # print('*****************************************   no more paddle :(')
 
