@@ -109,6 +109,7 @@ class Breakout:
         i = 0
         # self.communicate()
         # print('startCOMMUNICATE')
+        self.new_ball_monitor()
         while True and self.kill():
             # print(self.pair_list.get())
             if self.get_item_position('ball'):
@@ -181,6 +182,23 @@ class Breakout:
 
     def communicate(self):
         Thread(target=self._communicate).start()
+
+    def new_ball_monitor(self):
+        Thread(target=self._new_ball_monitor).start()
+
+    def _new_ball_monitor(self):
+        time_1 = time.time()
+        print('monitor: ' + str(self.get_item_position('ball')))
+        while True and self.kill():
+            print('monitor: ' + str(self.get_item_position('ball')))
+            if not self.get_item_position('ball'):
+                new_time = time.time()
+                if abs(time_1 - new_time) > 3:
+                    keyboard.press(keyboard.S, .1)
+                    time_1 = time.time()
+            time.sleep(1)
+
+
 
     def _communicate(self):
         print('start_communicate')
