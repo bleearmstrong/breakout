@@ -20,7 +20,7 @@ for i in range(len(points) - 1):
     p3, = ax.plot(x_3, -340, 'g^', markersize=22)
     p4, = ax.plot(x_4, -340, 'm^', markersize=22)
     plt.show()
-    plt.pause(.01)
+    plt.pause(.2)
     p1.remove()
     p2.remove()
     p3.remove()

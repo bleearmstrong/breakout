@@ -114,6 +114,7 @@ class Breakout:
             # print(self.pair_list.get())
             if self.get_item_position('ball'):
                 while self.get_item_position('ball'):
+                    print('in play thread starting')
                     # print('ball position: ' + str(self.ball_position))
                     # print('predicting: time is ' + str(time.time()))
                     i += 1
@@ -140,26 +141,29 @@ class Breakout:
                     self.ball_history.append(self.ball_position)
                     self.paddle_history.append(self.paddle_position)
                     self.desired_paddle_position_history.append(self.desired_paddle_position)
+                    time.sleep(.05)
+                    print('in play thread ending')
             time.sleep(.05)
 
 
     def _move_paddle(self):
         millis = int(round(time.time() * 1000))
         while True and self.kill():
-            print('moving!')
-            print('millis since last move: ' + str(millis - int(round(time.time() * 1000))))
+            print('move paddle thread starting')
+            # print('moving!')
+            # print('millis since last move: ' + str(millis - int(round(time.time() * 1000))))
             current_position = self.get_midpoint(self.get_item_position('paddle'))[0]
             self.paddle_position = current_position
-            print('current position: ' + str(current_position))
-            print('desired paddle position = ' + str(self.desired_paddle_position))
+            # print('current position: ' + str(current_position))
+            # print('desired paddle position = ' + str(self.desired_paddle_position))
             move = self.desired_paddle_position - current_position
-            print('move = ' + str(move))
+            # print('move = ' + str(move))
             if abs(move) < 10:
                 continue
             if abs(move) > 336:
                 move = 10
 
-            hold = abs(move/20 * 0.04)
+            hold = abs(move/15 * 0.04)
             # print('hold = ' + str(hold))
             # hold = .1
             # print('desired paddle position is : ' + str(self.desired_paddle_position))
@@ -172,6 +176,7 @@ class Breakout:
             millis = int(round(time.time() * 1000))
             # time.sleep(.05)
             # print('moving paddle; time is ' + str(time.time()))
+            print('move paddle thread ending')
         # print('*****************************************   no more paddle :(')
 
     def move_paddle(self):
